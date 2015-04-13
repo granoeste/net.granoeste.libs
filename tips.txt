@@ -1,0 +1,17 @@
+AndroidStudio 「getClass()」でエラー？ http://android.benigumo.com/20131125/androidstudio-%E3%80%8Cgetclass%E3%80%8D%E3%81%A7%E3%82%A8%E3%83%A9%E3%83%BC%EF%BC%9F/
+Ambigous method call: Object and Object : IDEA-72835 http://youtrack.jetbrains.com/issue/IDEA-72835
+
+compile('ch.acra:acra:4.5.0') {     exclude group: 'org.json' } https://github.com/ACRA/acra/issues/159
+
+
+- [Building Your Project with Gradle | Android Developers](http://developer.android.com/sdk/installing/studio-build.html)
+- [1.05. Android のビルドについて（Gradle） · mixi-inc/AndroidTraining Wiki](https://github.com/mixi-inc/AndroidTraining/wiki/1.05.-Android-%E3%81%AE%E3%83%93%E3%83%AB%E3%83%89%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6%EF%BC%88Gradle%EF%BC%89)
+- [AndroidStudioはじめました ~Gradle編~](http://www.slideshare.net/MtTomo32/2-3-33576143)
+
+- [Migrating from Eclipse | Android Developers](https://developer.android.com/sdk/installing/migrate.html)
+
+- [【Android】Robolectricでユニットテストを行う - 導入編 | Yohei Blog](http://blog.yohei.org/android-robolectric-start/)
+- [【Android】Android Studio + Gradle + Robolectric！でテストをしよう | Yohei Blog](http://blog.yohei.org/android-studio-gradle-robolectric1/)
+- [【Android】Robolectirc & Mockito & PowerMockでテストする | Yohei Blog](http://blog.yohei.org/android-test-use-robolectirc-mockito-powermock/)
+- [【Android】MockItoを使おう！ | Yohei Blog](http://blog.yohei.org/android-lets-use-mockito/)
+

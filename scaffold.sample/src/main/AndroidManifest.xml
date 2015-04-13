@@ -1,0 +1,26 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="net.granoeste.scaffold.sample">
+
+    <application android:allowBackup="true"
+        android:name=".app.MainApplication_"
+        android:label="@string/app_name"
+        android:icon="@drawable/ic_launcher"
+        android:theme="@style/AppTheme">
+
+        <activity
+            android:name=".app.MainActivity_"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".app.HybridActivity_"
+            android:label="@string/title_activity_hybrid" >
+        </activity>
+
+    </application>
+
+</manifest>

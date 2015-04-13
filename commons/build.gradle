@@ -1,0 +1,65 @@
+apply plugin: 'com.android.library'
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+
+group = 'net.granoeste.libs'
+
+def groupId = 'net.granoeste.libs'
+def artifactId = 'commons'
+
+android {
+    compileSdkVersion 21
+    buildToolsVersion "21.1.2"
+
+    defaultConfig {
+        minSdkVersion 10
+        targetSdkVersion 21
+        versionCode 1
+        versionName '1.0.0'
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles  getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    lintOptions {
+        abortOnError false
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile "org.apache.commons:commons-lang3:3.3.2"
+
+}
+
+//ext {
+//    mavenRepository = "C:/Users/katsu_000/Dropbox/Devs/AndroidWorkspace/MyApps/net.granoeste.maven"
+//}
+//
+//uploadArchives {
+//    repositories {
+//        mavenDeployer {
+//            repository(url: uri(mavenRepository))
+//        }
+//    }
+//}
+
+android.libraryVariants
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = groupId
+            artifactId = artifactId
+            version = android.defaultConfig.versionName
+            artifact source: file("${project.buildDir}/outputs/aar/${project.name}-release.aar")
+        }
+    }
+    repositories {
+        maven {
+            url "file:${projectDir}/maven-repo"
+
+        }
+    }
+}

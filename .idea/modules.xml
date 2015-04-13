@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/commons/commons.iml" filepath="$PROJECT_DIR$/commons/commons.iml" />
+      <module fileurl="file://$PROJECT_DIR$/commons.nfc/commons.nfc.iml" filepath="$PROJECT_DIR$/commons.nfc/commons.nfc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/commons.twitter/commons.twitter.iml" filepath="$PROJECT_DIR$/commons.twitter/commons.twitter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/commons.ui/commons.ui.iml" filepath="$PROJECT_DIR$/commons.ui/commons.ui.iml" />
+      <module fileurl="file://$PROJECT_DIR$/net.granoeste.libs.iml" filepath="$PROJECT_DIR$/net.granoeste.libs.iml" />
+      <module fileurl="file://$PROJECT_DIR$/scaffold/scaffold.iml" filepath="$PROJECT_DIR$/scaffold/scaffold.iml" />
+      <module fileurl="file://$PROJECT_DIR$/scaffold.sample/scaffold.sample.iml" filepath="$PROJECT_DIR$/scaffold.sample/scaffold.sample.iml" />
+      <module fileurl="file://$PROJECT_DIR$/validator/validator.iml" filepath="$PROJECT_DIR$/validator/validator.iml" />
+    </modules>
+  </component>
+</project>
+

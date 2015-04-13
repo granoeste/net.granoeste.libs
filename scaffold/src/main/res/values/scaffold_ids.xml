@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <item name="webview_empty" type="id"/>
+    <item name="webview_progress_container" type="id"/>
+    <item name="webview_content_container" type="id"/>
+
+</resources>

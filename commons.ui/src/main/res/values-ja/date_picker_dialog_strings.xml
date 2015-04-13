@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- DatePickerDialog -->
+    <string name="date_time_set">設定</string>
+    <string name="date_picker_dialog_title">日付設定</string>
+
+</resources>

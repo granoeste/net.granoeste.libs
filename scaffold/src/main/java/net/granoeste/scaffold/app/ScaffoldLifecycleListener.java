@@ -18,36 +18,48 @@ package net.granoeste.scaffold.app;
 
 import android.content.Context;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
 /**
  * Activity/Fragment/Serviceのライフサイクルリスナー
  * Scaffoldはライフサイクルに合わせてこのリスナーをコールする。
  */
 public abstract class ScaffoldLifecycleListener {
 
-    public void onCreated(Context context) {
+    public interface Callback {
+        void onEvent(ScaffoldLifecycleListener listener, Object e);
+    }
+
+    protected Callback mCallback = new Callback(){
+        @Override
+        public void onEvent(ScaffoldLifecycleListener listener, Object e) {
+            // NOP
+        }
     };
+
+    public ScaffoldLifecycleListener() {
+    }
+
+    public ScaffoldLifecycleListener(Callback mCallback) {
+        this.mCallback = mCallback;
+    }
+
+    public void onCreated(Context context) {
+    }
 
     public void onStarted(Context context) {
-    };
+    }
 
     public void onStopped(Context context) {
-    };
+    }
 
     public void onDestroyed(Context context) {
-    };
-
-    // ------------------------------------------------------------------------
-    // EventBus
-    // ------------------------------------------------------------------------
-    protected final void postEvent(Object e) {
-        BusProvider.getInstance().post(e);
     }
 
-    protected final void registerEventBus() {
-        BusProvider.getInstance().register(this);
-    }
-
-    protected final void unregisterEventBus() {
-        BusProvider.getInstance().unregister(this);
+    protected void postEvent(Object e ) {
+        mCallback.onEvent(this, e);
     }
 }

@@ -26,7 +26,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.uphyca.lifecyclecallbacks.LifecycleCallbacksSupportDialogFragment;
+import net.granoeste.scaffold.lifecyclecallbacks.LifecycleCallbacksSupportDialogFragment;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -109,6 +109,10 @@ public abstract class ScaffoldDialogFragment extends LifecycleCallbacksSupportDi
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
+    protected ScaffoldActivity getScaffoldActivity() {
+        return (ScaffoldActivity) getActivity();
+    }
+
     // ------------------------------------------------------------------------
     // Toast Utility
     // ------------------------------------------------------------------------
@@ -133,21 +137,6 @@ public abstract class ScaffoldDialogFragment extends LifecycleCallbacksSupportDi
         if (activity != null) {
             Toast.makeText(activity, resId, duration).show();
         }
-    }
-
-    // ------------------------------------------------------------------------
-    // EventBus
-    // ------------------------------------------------------------------------
-    protected final void postEvent(Object e) {
-        BusProvider.getInstance().post(e);
-    }
-
-    protected final void registerEventBus() {
-        BusProvider.getInstance().register(this);
-    }
-
-    protected final void unregisterEventBus() {
-        BusProvider.getInstance().unregister(this);
     }
 
 }

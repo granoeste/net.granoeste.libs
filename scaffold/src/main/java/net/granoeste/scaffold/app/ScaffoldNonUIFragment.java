@@ -16,10 +16,9 @@
 
 package net.granoeste.scaffold.app;
 
-import android.app.Activity;
 import android.os.Bundle;
 
-import com.uphyca.lifecyclecallbacks.LifecycleCallbacksSupportFragment;
+import net.granoeste.scaffold.lifecyclecallbacks.LifecycleCallbacksSupportFragment;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -28,14 +27,9 @@ import java.util.Set;
 import static net.granoeste.commons.util.LogUtils.makeLogTag;
 
 public abstract class ScaffoldNonUIFragment extends LifecycleCallbacksSupportFragment {
-	private static final String TAG = makeLogTag(ScaffoldNonUIFragment.class);
-	public static final String ARG_URI = ScaffoldConstants.ARG_URI;
-	public static final String ARG_ACTION = ScaffoldConstants.ARG_ACTION;
-	private ScaffoldActivity mActivity;
-
-    public ScaffoldActivity getBaseActivity() {
-        return mActivity;
-    }
+    private static final String TAG = makeLogTag(ScaffoldNonUIFragment.class);
+    public static final String ARG_URI = ScaffoldConstants.ARG_URI;
+    public static final String ARG_ACTION = ScaffoldConstants.ARG_ACTION;
 
     private final Set<ScaffoldLifecycleListener> mScaffoldLifecycleListeners
             = Collections.synchronizedSet(new HashSet<ScaffoldLifecycleListener>());
@@ -47,18 +41,6 @@ public abstract class ScaffoldNonUIFragment extends LifecycleCallbacksSupportFra
     protected void removeLifecycleListener(ScaffoldLifecycleListener listener) {
         mScaffoldLifecycleListeners.remove(listener);
     }
-
-    @Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		mActivity = (ScaffoldActivity) activity;
-	}
-
-	@Override
-	public void onDetach() {
-		super.onDetach();
-		mActivity = null;
-	}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -107,19 +89,8 @@ public abstract class ScaffoldNonUIFragment extends LifecycleCallbacksSupportFra
         super.onDestroy();
     }
 
-    // ------------------------------------------------------------------------
-    // EventBus
-    // ------------------------------------------------------------------------
-    protected void postEvent(Object e) {
-        BusProvider.getInstance().post(e);
-    }
-
-    protected void registerEventBus() {
-        BusProvider.getInstance().register(this);
-    }
-
-    protected void unregisterEventBus() {
-        BusProvider.getInstance().unregister(this);
+    protected ScaffoldActivity getScaffoldActivity() {
+        return (ScaffoldActivity) getActivity();
     }
 
 }

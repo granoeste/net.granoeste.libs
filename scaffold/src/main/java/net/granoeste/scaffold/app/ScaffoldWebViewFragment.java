@@ -48,7 +48,7 @@ import android.widget.ProgressBar;
 import net.granoeste.commons.util.UIUtils;
 import net.granoeste.scaffold.R;
 
-public abstract class ScaffoldWebViewFragment extends ScaffoldFragment {
+public class ScaffoldWebViewFragment extends ScaffoldFragment {
     private static final String TAG = makeLogTag(ScaffoldWebViewFragment.class);
 
     // フレーム用ID
@@ -65,11 +65,11 @@ public abstract class ScaffoldWebViewFragment extends ScaffoldFragment {
     // Callback Definition
     // ------------------------------------------------------------------------
     public interface Callbacks {
-        public boolean shouldOverrideUrlLoading(final WebView view, final String url);
+        boolean shouldOverrideUrlLoading(final WebView view, final String url);
 
-        public void onPageFinished(final WebView view, final String url);
+        void onPageFinished(final WebView view, final String url);
 
-        public void onReceivedError(final WebView view, final int errorCode,
+        void onReceivedError(final WebView view, final int errorCode,
                                     final String description, final String url);
     }
 
@@ -89,7 +89,7 @@ public abstract class ScaffoldWebViewFragment extends ScaffoldFragment {
 
     };
 
-    private Callbacks mCallbacks = mDummyCallbacks;
+    protected Callbacks mCallbacks = mDummyCallbacks;
     // ------------------------------------------------------------------------
 
     private LinearLayout mPFrame;
@@ -338,7 +338,7 @@ public abstract class ScaffoldWebViewFragment extends ScaffoldFragment {
 
     // ------------------------------------------------------------------------
     public void loadUrl(String url) {
-        LOGD(TAG, "get url... " + url);
+        LOGD(TAG, "load url... " + url);
         mPFrame.setVisibility(View.VISIBLE);
         mWebView.loadUrl(url);
     }
@@ -379,20 +379,20 @@ public abstract class ScaffoldWebViewFragment extends ScaffoldFragment {
     }
 
     /**
-     * get data
+     * load data
      *
      * @param data
      * @param mimeType
      * @param encoding
      */
     public void loadData(String data, String mimeType, String encoding) {
-        LOGD(TAG, "get data... ");
+        LOGD(TAG, "load data... ");
         mPFrame.setVisibility(View.VISIBLE);
         mWebView.loadData(data, mimeType, encoding);
     }
 
     /**
-     * get data with base url
+     * load data with base url
      *
      * @param baseUrl
      * @param data
@@ -402,11 +402,16 @@ public abstract class ScaffoldWebViewFragment extends ScaffoldFragment {
      */
     public void loadDataWithBaseURL(String baseUrl, String data, String mimeType, String encoding,
                                     String failUrl) {
-        LOGD(TAG, "get data with base url... ");
+        LOGD(TAG, "load data with base url... ");
         mPFrame.setVisibility(View.VISIBLE);
         mWebView.loadDataWithBaseURL(baseUrl, data, mimeType, encoding, failUrl);
     }
 
+    /**
+     * Get WebView
+     *
+     * @return webView
+     */
     public InternalWebView getWebView() {
         return mWebView;
     }

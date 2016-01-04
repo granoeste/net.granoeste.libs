@@ -16,11 +16,8 @@
 
 package net.granoeste.scaffold.app;
 
-import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.app.FragmentManager;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -28,39 +25,31 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.PersistableBundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
+import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.Toast;
 
-import com.uphyca.lifecyclecallbacks.LifecycleCallbacksSupportActionBarActivity;
-
-import net.granoeste.commons.ui.IconContextMenu;
-import net.granoeste.commons.ui.IconContextMenuDialogFragment;
-import net.granoeste.commons.ui.IconContextMenuItem;
-import net.granoeste.commons.util.UIUtils;
-import net.granoeste.scaffold.app.builder.ActivityIntentBuilder;
+import net.granoeste.scaffold.lifecyclecallbacks.LifecycleCallbacksSupportAppCompatActivity;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import de.keyboardsurfer.android.widget.crouton.Configuration;
-import de.keyboardsurfer.android.widget.crouton.Crouton;
-import de.keyboardsurfer.android.widget.crouton.Style.Builder;
-
 import static net.granoeste.commons.util.LogUtils.makeLogTag;
 
 public abstract class ScaffoldActivity extends
-        LifecycleCallbacksSupportActionBarActivity implements
-        ScaffoldAlertDialogFragment.OnAlertDialogEventListener,
-        IconContextMenuDialogFragment.Callbacks {
+        LifecycleCallbacksSupportAppCompatActivity implements
+        ScaffoldAlertDialogFragment.OnAlertDialogEventListener {
     private static final String TAG = makeLogTag(ScaffoldActivity.class);
+
+    protected boolean mHasSavedInstanceState;
+    protected boolean mPaused;
 
     private Handler mInternalHandler;
 
@@ -79,6 +68,7 @@ public abstract class ScaffoldActivity extends
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mHasSavedInstanceState = (savedInstanceState != null);
 
 //        Bundle extras = getIntent().getExtras();
 //
@@ -114,6 +104,12 @@ public abstract class ScaffoldActivity extends
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
+        super.onCreate(savedInstanceState, persistentState);
+        mHasSavedInstanceState = (savedInstanceState != null);
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
         ((ScaffoldApplication) getApplication()).getTracker()
@@ -124,6 +120,18 @@ public abstract class ScaffoldActivity extends
                 listener.onStarted(this);
             }
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mPaused = false;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mPaused = true;
     }
 
     @Override
@@ -141,9 +149,6 @@ public abstract class ScaffoldActivity extends
 
     @Override
     protected void onDestroy() {
-        clearCroutons();
-        Crouton.cancelAllCroutons();
-
         synchronized (mScaffoldLifecycleListeners) {
             for (ScaffoldLifecycleListener listener : mScaffoldLifecycleListeners) {
                 listener.onDestroyed(this);
@@ -159,7 +164,7 @@ public abstract class ScaffoldActivity extends
         List<Fragment> frags = getSupportFragmentManager().getFragments();
         if (frags != null && !frags.isEmpty()) {
             for (Fragment f : frags) {
-                if (f.isAdded()) {
+                if (f != null && f.isAdded()) {
                     if (f instanceof ScaffoldOnWindowFocusChangedListener) {
                         ((ScaffoldOnWindowFocusChangedListener) f).onWindowFocusChanged(hasFocus);
                     }
@@ -168,92 +173,23 @@ public abstract class ScaffoldActivity extends
         }
     }
 
-    // This snippet hides the system bars.
-    @SuppressLint("InlinedApi")
-    private void hideSystemUI() {
-        // Set the IMMERSIVE flag.
-        // Set the content to appear under the system bars so that the content
-        // doesn't resize when the system bars hide and show.
-//        if (UIUtils.hasHoneycombMR1()) {
-//            getWindow().getDecorView().setSystemUiVisibility(
-//                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-//                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-//                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-//                            | View.SYSTEM_UI_FLAG_LOW_PROFILE
-//                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
-//                            | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
-//                            | View.SYSTEM_UI_FLAG_IMMERSIVE);
-//        }
-        int newUiOptions = getWindow().getDecorView().getSystemUiVisibility();;
-        // Navigation bar hiding:  Backwards compatible to ICS.
-        if (UIUtils.hasICS()) {
-            newUiOptions |= View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        // WTF: LGE Bug... NullPointerException (@PhoneWindow:onKeyUpPanel:1002) {main} - Stack Overflow http://stackoverflow.com/questions/26833242/nullpointerexception-phonewindowonkeyuppanel1002-main
+        if (keyCode == KeyEvent.KEYCODE_MENU && "LGE".equalsIgnoreCase(Build.BRAND)) {
+            return true;
         }
-        // Status bar hiding: Backwards compatible to Jellybean
-        if (UIUtils.hasJellyBean()) {
-            newUiOptions |= View.SYSTEM_UI_FLAG_FULLSCREEN;
-        }
-        if (UIUtils.hasKitkat()) {
-            newUiOptions |= View.SYSTEM_UI_FLAG_IMMERSIVE;
-        }
-        getWindow().getDecorView().setSystemUiVisibility(newUiOptions);
+        return super.onKeyDown(keyCode, event);
     }
 
-    // This snippet hides the system bars.
-    @SuppressLint("InlinedApi")
-    private void hideSystemUISticky() {
-        // Set the IMMERSIVE flag.
-        // Set the content to appear under the system bars so that the content
-        // doesn't resize when the system bars hide and show.
-//        if (UIUtils.hasHoneycombMR1()) {
-//            getWindow().getDecorView().setSystemUiVisibility(
-//                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-//                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-//                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-//                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-//                            | View.SYSTEM_UI_FLAG_FULLSCREEN
-//                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-//        }
-
-        int newUiOptions = getWindow().getDecorView().getSystemUiVisibility();;
-        // Navigation bar hiding:  Backwards compatible to ICS.
-        if (UIUtils.hasICS()) {
-            newUiOptions |= View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        // WTF: LGE Bug... NullPointerException (@PhoneWindow:onKeyUpPanel:1002) {main} - Stack Overflow http://stackoverflow.com/questions/26833242/nullpointerexception-phonewindowonkeyuppanel1002-main
+        if (keyCode == KeyEvent.KEYCODE_MENU && "LGE".equalsIgnoreCase(Build.BRAND)) {
+            openOptionsMenu();
+            return true;
         }
-        // Status bar hiding: Backwards compatible to Jellybean
-        if (UIUtils.hasJellyBean()) {
-            newUiOptions |= View.SYSTEM_UI_FLAG_FULLSCREEN;
-        }
-        if (UIUtils.hasKitkat()) {
-            newUiOptions |= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-        }
-        getWindow().getDecorView().setSystemUiVisibility(newUiOptions);
-    }
-
-    // This snippet shows the system bars. It does this by removing all the flags
-    // except for the ones that make the content appear under the system bars.
-    @SuppressLint("InlinedApi")
-    private void showSystemUI() {
-//        if (UIUtils.hasHoneycombMR1()) {
-//            getWindow().getDecorView().setSystemUiVisibility(
-//                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-//                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-//                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-//        }
-
-        int newUiOptions = getWindow().getDecorView().getSystemUiVisibility();
-        // Navigation bar hiding:  Backwards compatible to ICS.
-        if (UIUtils.hasICS()) {
-            newUiOptions &= ~View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
-        }
-        // Status bar hiding: Backwards compatible to Jellybean
-        if (UIUtils.hasJellyBean()) {
-            newUiOptions &= ~View.SYSTEM_UI_FLAG_FULLSCREEN;
-        }
-        if (UIUtils.hasKitkat()) {
-            newUiOptions &= ~View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-        }
-        getWindow().getDecorView().setSystemUiVisibility(newUiOptions);
+        return super.onKeyUp(keyCode, event);
     }
 
     // ------------------------------------------------------------------------
@@ -292,7 +228,7 @@ public abstract class ScaffoldActivity extends
          * @param activity
          */
         public InternalHandler(ScaffoldActivity activity) {
-            mActivity = new WeakReference<ScaffoldActivity>(activity);
+            mActivity = new WeakReference<>(activity);
         }
 
         @Override
@@ -323,7 +259,7 @@ public abstract class ScaffoldActivity extends
      * Converts an intent into a {@link android.os.Bundle} suitable for use as
      * fragment arguments.
      */
-    public static final Bundle intentToFragmentArguments(final Intent intent) {
+    public static Bundle intentToFragmentArguments(final Intent intent) {
         final Bundle arguments = new Bundle();
         if (intent == null) {
             return arguments;
@@ -350,7 +286,7 @@ public abstract class ScaffoldActivity extends
     /**
      * Converts a fragment arguments bundle into an intent.
      */
-    public static final Intent fragmentArgumentsToIntent(final Bundle arguments) {
+    public static Intent fragmentArgumentsToIntent(final Bundle arguments) {
         final Intent intent = new Intent();
         if (arguments == null) {
             return intent;
@@ -369,21 +305,6 @@ public abstract class ScaffoldActivity extends
         intent.putExtras(arguments);
         intent.removeExtra(ScaffoldConstants.ARG_URI);
         return intent;
-    }
-
-    // ------------------------------------------------------------------------
-    // EventBus
-    // ------------------------------------------------------------------------
-    protected final void postEvent(Object e) {
-        BusProvider.getInstance().post(e);
-    }
-
-    protected final void registerEventBus() {
-        BusProvider.getInstance().register(this);
-    }
-
-    protected final void unregisterEventBus() {
-        BusProvider.getInstance().unregister(this);
     }
 
     // ------------------------------------------------------------------------
@@ -439,7 +360,7 @@ public abstract class ScaffoldActivity extends
                 .hasNegative(hasNegative)
                 .cancelable(cancelable)
                 .tag(tag)
-                .show();
+                .buildAndShow();
     }
 
     /**
@@ -472,7 +393,11 @@ public abstract class ScaffoldActivity extends
                 .negativeText(negativeText)
                 .cancelable(cancelable)
                 .tag(tag)
-                .show();
+                .buildAndShow();
+    }
+
+    protected final ScaffoldAlertDialogFragment.FragmentBuilder getDialogBuilder() {
+        return ScaffoldAlertDialogFragment.builder(this, getSupportFragmentManager());
     }
 
     // CallBack Listener
@@ -481,13 +406,13 @@ public abstract class ScaffoldActivity extends
                                     final int whichButton, final String tag) {
         switch (whichButton) {
         case DialogInterface.BUTTON_POSITIVE:
-            doPositiveClick(dialog, whichButton, tag);
+            doPositiveClick(dialog, tag);
             break;
         case DialogInterface.BUTTON_NEUTRAL:
-            doNeutralClick(dialog, whichButton, tag);
+            doNeutralClick(dialog, tag);
             break;
         case DialogInterface.BUTTON_NEGATIVE:
-            doNegativeClick(dialog, whichButton, tag);
+            doNegativeClick(dialog, tag);
             break;
         default:
             break;
@@ -503,22 +428,19 @@ public abstract class ScaffoldActivity extends
      * doPositiveClick
      *
      * @param dialog
-     * @param whichButton
      * @param tag
      */
-    protected void doPositiveClick(final DialogInterface dialog,
-                                   final int whichButton, final String tag) {
+    protected void doPositiveClick(final DialogInterface dialog, final String tag) {
+
     }
 
     /**
      * doNeutralClick
      *
      * @param dialog
-     * @param whichButton
      * @param tag
      */
-    protected void doNeutralClick(final DialogInterface dialog,
-                                  final int whichButton, final String tag) {
+    protected void doNeutralClick(final DialogInterface dialog, final String tag) {
 
     }
 
@@ -526,11 +448,10 @@ public abstract class ScaffoldActivity extends
      * doNegativeClick
      *
      * @param dialog
-     * @param whichButton
      * @param tag
      */
-    protected void doNegativeClick(final DialogInterface dialog,
-                                   final int whichButton, final String tag) {
+    protected void doNegativeClick(final DialogInterface dialog, final String tag) {
+
     }
 
     /**
@@ -540,6 +461,7 @@ public abstract class ScaffoldActivity extends
      * @param tag
      */
     protected void doCancel(final DialogInterface dialog, final String tag) {
+
     }
 
     /**
@@ -570,11 +492,13 @@ public abstract class ScaffoldActivity extends
 
     /**
      * @deprecated Old no-arguments version of {@link #onCreateDialog(int, Bundle)}.
+     * @param id
+     * @return always null
      */
     @Deprecated
     @Override
     protected final Dialog onCreateDialog(int id) {
-        return super.onCreateDialog(id);
+        return null;
     }
 
     /**
@@ -585,7 +509,7 @@ public abstract class ScaffoldActivity extends
     @Deprecated
     @Override
     protected final Dialog onCreateDialog(int id, Bundle args) {
-        return super.onCreateDialog(id, args);
+        return null;
     }
 
     /**
@@ -595,7 +519,6 @@ public abstract class ScaffoldActivity extends
     @Deprecated
     @Override
     protected final void onPrepareDialog(int id, Dialog dialog) {
-        super.onPrepareDialog(id, dialog);
     }
 
     /**
@@ -606,28 +529,6 @@ public abstract class ScaffoldActivity extends
     @Deprecated
     @Override
     protected final void onPrepareDialog(int id, Dialog dialog, Bundle args) {
-        super.onPrepareDialog(id, dialog, args);
-    }
-
-    // ------------------------------------------------------------------------
-    // IconContextMenu DialogFragment Utility
-    // ------------------------------------------------------------------------
-    public void showIconContextMenu(String title,
-                                    ArrayList<IconContextMenuItem> iconContextMenuItems) {
-
-        IconContextMenu iconContextMenu = new IconContextMenu(iconContextMenuItems);
-        // set Title
-        iconContextMenu.setMenuTitle(title);
-        // show
-        iconContextMenu.show(getSupportFragmentManager(), null);
-    }
-
-    @Override
-    public void onIconContextMenuOnItemSelected(final IconContextMenuItem menuItem) {
-        doIconContextMenuOnItemSelected(menuItem);
-    }
-
-    public void doIconContextMenuOnItemSelected(final IconContextMenuItem menuItem) {
     }
 
     // ------------------------------------------------------------------------
@@ -648,108 +549,6 @@ public abstract class ScaffoldActivity extends
 
     public void showToast(final int resId, int duration) {
         Toast.makeText(this, resId, duration).show();
-    }
-
-    // Crouton Toast
-    public void showCroutonAlert(final CharSequence text) {
-        showCrouton(text, de.keyboardsurfer.android.widget.crouton.Style.ALERT);
-    }
-
-    public void showCroutonConfirm(final CharSequence text) {
-        showCrouton(text, de.keyboardsurfer.android.widget.crouton.Style.CONFIRM);
-    }
-
-    public void showCroutonInfo(final CharSequence text) {
-        showCrouton(text, de.keyboardsurfer.android.widget.crouton.Style.INFO);
-    }
-
-    public void showCroutonAlert(final int textResourceId) {
-        showCrouton(textResourceId, de.keyboardsurfer.android.widget.crouton.Style.ALERT);
-    }
-
-    public void showCroutonConfirm(final int textResourceId) {
-        showCrouton(textResourceId, de.keyboardsurfer.android.widget.crouton.Style.CONFIRM);
-    }
-
-    public void showCroutonInfo(final int textResourceId) {
-        showCrouton(textResourceId, de.keyboardsurfer.android.widget.crouton.Style.INFO);
-    }
-
-    public void showCrouton(final int textResourceId,
-                            final de.keyboardsurfer.android.widget.crouton.Style croutonStyle) {
-        showCrouton(getString(textResourceId), croutonStyle);
-    }
-
-    public void showCrouton(final CharSequence croutonText,
-                            final de.keyboardsurfer.android.widget.crouton.Style croutonStyle) {
-        Crouton.makeText(this, croutonText, croutonStyle).show();
-    }
-
-    public void showCrouton(final CharSequence croutonText,
-                            final de.keyboardsurfer.android.widget.crouton.Style croutonStyle,
-                            ViewGroup viewGroup) {
-        Crouton.makeText(this, croutonText, croutonStyle, viewGroup).show();
-    }
-
-    private Crouton mCrouton;
-
-    private static final de.keyboardsurfer.android.widget.crouton.Style INFINITE_ALERT =
-            new Builder()
-                    .setConfiguration(
-                            new Configuration.Builder()
-                                    .setDuration(
-                                            Configuration.DURATION_INFINITE)
-                                    .build())
-                    .setBackgroundColorValue(
-                            de.keyboardsurfer.android.widget.crouton.Style.holoRedLight)
-                    .setHeight(LayoutParams.WRAP_CONTENT)
-                    .build();
-
-    protected Crouton showCroutonAlertInfinity(final CharSequence text, int viewGroupResId) {
-        if (mCrouton != null) {
-            mCrouton.cancel();
-        }
-        mCrouton = Crouton.makeText(this, text, INFINITE_ALERT, viewGroupResId);
-        mCrouton.show();
-
-        return mCrouton;
-    }
-
-    protected Crouton showCroutonAlertInfinity(final CharSequence text) {
-        if (mCrouton != null) {
-            mCrouton.cancel();
-        }
-        mCrouton = Crouton.makeText(this, text, INFINITE_ALERT);
-        mCrouton.show();
-
-        return mCrouton;
-    }
-
-    protected Crouton showCroutonAlertInfinity(final int textResourceId, int viewGroupResId) {
-        if (mCrouton != null) {
-            mCrouton.cancel();
-        }
-        mCrouton = Crouton.makeText(this, textResourceId, INFINITE_ALERT, viewGroupResId);
-        mCrouton.show();
-
-        return mCrouton;
-    }
-
-    protected Crouton showCroutonAlertInfinity(final int textResourceId) {
-        if (mCrouton != null) {
-            mCrouton.cancel();
-        }
-        mCrouton = Crouton.makeText(this, textResourceId, INFINITE_ALERT);
-        mCrouton.show();
-
-        return mCrouton;
-    }
-
-    public void clearCroutons() {
-        if (mCrouton != null) {
-            mCrouton.cancel();
-        }
-        Crouton.clearCroutonsForActivity(this);
     }
 
     // ------------------------------------------------------------------------
@@ -778,28 +577,4 @@ public abstract class ScaffoldActivity extends
         return (T) getSupportFragmentManager().findFragmentByTag(tag);
     }
 
-//    /**
-//     * IntentBuilder
-//     */
-//    public static class IntentBuilder
-//            extends ActivityIntentBuilder<ScaffoldActivity.IntentBuilder> {
-//
-//        private Fragment fragmentSupport_;
-//
-//        public IntentBuilder(Context context, Class<?> clazz) {
-//            super(context, clazz);
-//        }
-//
-//        public IntentBuilder(Fragment fragment, Class<?> clazz) {
-//            super(fragment.getActivity(), clazz);
-//            fragmentSupport_ = fragment;
-//        }
-//
-//        @Override
-//        public void startForResult(int requestCode) {
-//            if (fragmentSupport_!= null) {
-//                fragmentSupport_.startActivityForResult(intent, requestCode);
-//            }
-//        }
-//    }
 }

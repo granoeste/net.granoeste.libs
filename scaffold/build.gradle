@@ -1,31 +1,35 @@
 apply plugin: 'com.android.library'
-apply plugin: 'maven'
 
 apply plugin: 'checkstyle'
 apply plugin: 'findbugs'
 apply plugin: 'pmd'
 apply plugin: 'cpd'
 
-apply plugin: 'maven-publish'
+apply from: rootProject.file('maven-push.gradle')
 
 def groupId = 'net.granoeste.libs'
 def artifactId = 'scaffold'
-
-def AA_VERSION = '3.2'
+def versionMajor = 1
+def versionMinor = 0
+def versionPatch = 0
+def versionBuild = 0
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.2"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion 10
-        targetSdkVersion 21
-        versionCode 1
-        versionName '1.0.0'
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
+        versionName "${versionMajor}.${versionMinor}.${versionPatch}"
     }
+
     buildTypes {
         release {
             minifyEnabled false
+//            minifyEnabled true
+//            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -37,59 +41,74 @@ android {
         exclude 'META-INF/CERT.SF'
         exclude 'META-INF/DEPENDENCIES'
         exclude 'META-INF/LICENSE'
-        exclude 'META-INF/MANIFEST.MF'
         exclude 'META-INF/NOTICE'
+        exclude 'META-INF/DEPENDENCIES.txt'
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/dependencies.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/LGPL2.1'
+        exclude 'META-INF/MANIFEST.MF'
         exclude 'com/j256/ormlite/android/LICENSE.txt'
         exclude 'com/j256/ormlite/android/README.txt'
         exclude 'com/j256/ormlite/core/LICENSE.txt'
         exclude 'com/j256/ormlite/core/README.txt'
         exclude 'androidannotations-api.properties'
+        exclude 'META-INF/services/javax.annotation.processing.Processor'
     }
+
     lintOptions {
         abortOnError false
+        disable 'InvalidPackage'
     }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:21.0.3+'
-    compile 'com.android.support:gridlayout-v7:21.0.3+'
-    compile 'com.android.support:mediarouter-v7:21.0.3+'
+    compile "com.android.support:support-v4:${supportSupportVersion}"
+    compile "com.android.support:appcompat-v7:${supportAppcompatVersion}"
+    compile "com.android.support:design:${supportDesignVersion}"
+//    compile "com.android.support:cardview-v7:${supportCardviewVersion}"
+//    compile "com.android.support:gridlayout-v7:${supportGridlayoutVersion}"
+//    compile "com.android.support:palette-v7:${supportPaletteVersion}"
+//    compile "com.android.support:recyclerview-v7:${supportRecyclerviewVersion}"
+//    compile "com.android.support:mediarouter-v7:${supportMediarouterVersion}"
+//    compile "com.android.support:leanback-v17:${supportLeanbackVersion}"
 
-    compile('de.keyboardsurfer.android.widget:crouton:1.8.5@aar') {
-        exclude group: 'com.google.android', module: 'support-v4'
-    }
+//    compile('de.keyboardsurfer.android.widget:crouton:1.8.5@aar') {
+//        exclude group: 'com.google.android', module: 'support-v4'
+//    }
     compile 'com.google.inject:guice:3.0:no_aop'
     compile 'javax.inject:javax.inject:1'
 
-    compile 'com.jakewharton:disklrucache:2.0.2'
+//    compile 'com.jakewharton:disklrucache:2.0.2'
+//    compile 'com.jakewharton:butterknife:6.1.0'
     compile 'com.nineoldandroids:library:2.4.0'
 
-    compile 'com.squareup:otto:1.3.5'
-    compile 'com.squareup.picasso:picasso:2.3.4'
-    compile 'com.squareup.retrofit:retrofit:1.6.1'
-    compile 'com.squareup.okhttp:okhttp-urlconnection:2.0.0'
-    compile 'com.squareup.okhttp:okhttp:2.0.0'
+    compile 'com.squareup:otto:1.3.6'
+//    compile 'com.squareup.picasso:picasso:2.5.2'
+//    compile 'com.squareup.retrofit:retrofit:1.9.0'
+//    compile 'com.squareup.okhttp:okhttp-urlconnection:2.3.0'
+//    compile 'com.squareup.okhttp:okhttp:2.3.0'
 
 //    compile 'eu.inmite.android.lib:android-styled-dialogs:1.2.0'
 
-    compile 'org.codehaus.jackson:jackson-core-asl:1.9.13'
+//    compile 'org.codehaus.jackson:jackson-core-asl:1.9.13'
 
-    compile 'jp.mixi.compatibility:AndroidDeviceCompatibility:0.1.0'
+//    compile 'jp.mixi.compatibility:AndroidDeviceCompatibility:0.1.0'
 
-    compile('ch.acra:acra:4.5.0') {
-        exclude group: 'org.json'
-    }
+//    compile('ch.acra:acra:4.5.0') {
+//        exclude group: 'org.json'
+//    }
 
-    compile "org.androidannotations:androidannotations-api:$AA_VERSION"
 
     compile project(':commons')
-    compile project(':commons.ui')
+//    compile "net.granoeste.libs:commons:1.0.0"
+//    compile project(':commons.ui')
 }
 
-check.dependsOn 'checkstyle', 'findbugs', 'pmd', 'cpd'
+//check.dependsOn 'checkstyle', 'findbugs', 'pmd', 'cpd'
 
 task checkstyle(type: Checkstyle) {
     configFile = file('./config/quality/checkstyle/checkstyle.xml')
@@ -146,23 +165,5 @@ tasks.cpd {
     reports {
         xml.enabled = true
         xml.destination = file("${buildDir}/reports/cpd/cpd.xml")
-    }
-}
-
-android.libraryVariants
-publishing {
-    publications {
-        maven(MavenPublication) {
-            groupId = groupId
-            artifactId = artifactId
-            version = android.defaultConfig.versionName
-            artifact source: file("${project.buildDir}/outputs/aar/${project.name}-release.aar")
-        }
-    }
-    repositories {
-        maven {
-            url "file:${projectDir}/maven-repo"
-
-        }
     }
 }

@@ -20,7 +20,7 @@ import android.app.Activity;
 import android.support.v4.app.Fragment;
 
 import com.google.inject.Injector;
-import com.uphyca.lifecyclecallbacks.LifecycleCallbacksSupportApplication;
+import net.granoeste.scaffold.lifecyclecallbacks.LifecycleCallbacksSupportApplication;
 
 public class InjectionFragmentLifecycleCallbacks extends
 		LifecycleCallbacksSupportApplication.SimpleFragmentLifecycleCallbacks {

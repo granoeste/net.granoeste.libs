@@ -17,7 +17,6 @@
 package net.granoeste.scaffold.app;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -25,6 +24,7 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
 
 import net.granoeste.scaffold.R;
@@ -61,14 +61,16 @@ public class ScaffoldAlertDialogFragment extends ScaffoldDialogFragment {
     private final Set<OnAlertDialogEventListener> mOnAlertDialogEventListeners
             = Collections.synchronizedSet(new HashSet<OnAlertDialogEventListener>());
 
+    private View mCustomView;
+
     /**
      * Callbacks
      */
     public interface OnAlertDialogEventListener {
-        public void onDialogClick(final DialogInterface dialog, final int whichButton,
+        void onDialogClick(final DialogInterface dialog, final int whichButton,
                                   final String tag);
 
-        public void onDialogCancel(final DialogInterface dialog, final String tag);
+        void onDialogCancel(final DialogInterface dialog, final String tag);
     }
 
     /**
@@ -86,17 +88,12 @@ public class ScaffoldAlertDialogFragment extends ScaffoldDialogFragment {
         private FragmentManager fm;
         private Bundle args;
         private String tag;
+        private View customView;
 
         private FragmentBuilder(Context context, FragmentManager fm) {
             this.context = context.getApplicationContext();
             this.fm = fm;
             args = new Bundle();
-        }
-
-        public ScaffoldAlertDialogFragment build() {
-            ScaffoldAlertDialogFragment frag = new ScaffoldAlertDialogFragment();
-            frag.setArguments(args);
-            return frag;
         }
 
         public ScaffoldAlertDialogFragment.FragmentBuilder iconId(int iconId) {
@@ -184,8 +181,21 @@ public class ScaffoldAlertDialogFragment extends ScaffoldDialogFragment {
             return this;
         }
 
-        public void show() {
-            this.build().show(fm, tag != null ? tag : "dialog");
+        public ScaffoldAlertDialogFragment.FragmentBuilder setCustomView(View customView) {
+            this.customView = customView;
+            return this;
+        }
+        public ScaffoldAlertDialogFragment build() {
+            ScaffoldAlertDialogFragment frag = new ScaffoldAlertDialogFragment();
+            frag.setArguments(args);
+            frag.setCustomView(customView);
+            return frag;
+        }
+
+        public ScaffoldAlertDialogFragment buildAndShow() {
+            ScaffoldAlertDialogFragment frag = build();
+            frag.show(fm, tag != null ? tag : "dialog");
+            return frag;
         }
     }
 
@@ -308,9 +318,9 @@ public class ScaffoldAlertDialogFragment extends ScaffoldDialogFragment {
                 }
             });
         }
-        View customView = getCustomView();
-        if (customView != null) {
-            builder.setView(customView);
+//        View customView = getCustomView();
+        if (mCustomView != null) {
+            builder.setView(mCustomView);
         }
 
         Dialog dialog = builder.create();
@@ -319,12 +329,18 @@ public class ScaffoldAlertDialogFragment extends ScaffoldDialogFragment {
         return dialog;
     }
 
-    /**
-     * If you want to include custom view in AlertDialog, You Should be override getCustomView and return custom view.
-     *
-     * @return custom view
-     */
-    public View getCustomView() {
-        return null;
+//    /**
+//     * If you want to include custom view in AlertDialog, You Should be override getCustomView and return custom view.
+//     *
+//     * @return custom view
+//     */
+//    public View getCustomView() {
+//        return null;
+//    }
+
+    public ScaffoldAlertDialogFragment setCustomView(View customView) {
+        mCustomView = customView;
+        return this;
     }
+
 }

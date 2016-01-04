@@ -24,8 +24,8 @@ import net.granoeste.scaffold.di.config.DummyProductionModule;
 import net.granoeste.scaffold.di.inject.InjectionApplication;
 import net.granoeste.scaffold.util.Tracker;
 
-import org.acra.ACRA;
-import org.acra.annotation.ReportsCrashes;
+//import org.acra.ACRA;
+//import org.acra.annotation.ReportsCrashes;
 
 import android.app.Activity;
 import android.support.v4.app.Fragment;
@@ -36,7 +36,6 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 
-@ReportsCrashes(applicationLogFile = "crashReport.log", formKey = "")
 public abstract class ScaffoldApplication extends InjectionApplication {
     private static final String TAG = makeLogTag(ScaffoldApplication.class);
 
@@ -44,8 +43,6 @@ public abstract class ScaffoldApplication extends InjectionApplication {
 
     @Override
     public void onCreate() {
-        // The following line triggers the initialization of ACRA
-        ACRA.init(this);
         super.onCreate();
 
         // Injectorを生成して設定する

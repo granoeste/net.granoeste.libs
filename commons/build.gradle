@@ -1,21 +1,52 @@
 apply plugin: 'com.android.library'
-apply plugin: 'maven'
-apply plugin: 'maven-publish'
 
-group = 'net.granoeste.libs'
+//apply from: file('metadata.properties')
+apply from: rootProject.file('maven-push.gradle')
 
 def groupId = 'net.granoeste.libs'
 def artifactId = 'commons'
+def versionMajor = 1
+def versionMinor = 0
+def versionPatch = 0
+def versionBuild = 0
+
+project.ext {
+    File propertiesFile = file ('metadata.properties')
+    if (propertiesFile.exists()) {
+        Properties properties = new Properties()
+        propertiesFile.withInputStream {
+            properties.load(it)
+        }
+        properties.entrySet().each {
+            project.ext.set(it.key, it.value)
+        }
+    }
+}
+
+//void configure() {
+//    File propertiesFile = file ('metadata.properties')
+//    if (propertiesFile.exists()) {
+//        Properties properties = new Properties()
+//        propertiesFile.withInputStream {
+//            properties.load(it)
+//        }
+//        properties.entrySet().each {
+//            project.ext.set(it.key, it.value)
+//        }
+//    }
+//}
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.2"
+//    configure()
+
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion 10
-        targetSdkVersion 21
-        versionCode 1
-        versionName '1.0.0'
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
+        versionName "${versionMajor}.${versionMinor}.${versionPatch}"
     }
     buildTypes {
         release {
@@ -26,40 +57,38 @@ android {
     lintOptions {
         abortOnError false
     }
+
+    libraryVariants
 }
+
+//AndroidのJavaDocをgradleで生成する - http://osa030.hatenablog.com/entry/2015/06/03/183247
+//project.ext {
+//    if (android.hasProperty('applicationVariants')) {
+//        androidVariants = android.applicationVariants
+//    } else if (android.hasProperty('libraryVariants')) {
+//        androidVariants = android.libraryVariants
+//    }
+//}
+//project.androidVariants.all { variant ->
+//    task("generate${variant.name.capitalize()}Javadoc", type: Javadoc) {
+//        title = "BeeTV"
+//        description "Generates Javadoc for $variant.name."
+//        source = variant.javaCompile.source
+//        ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
+//        classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
+//        options.links("http://docs.oracle.com/javase/7/docs/api/");
+//        //options.links("http://d.android.com/reference/");
+//        options.linksOffline("http://d.android.com/reference", "${android.sdkDirectory}/docs/reference")
+//        options.docEncoding = 'UTF-8'
+//        options.encoding = 'UTF-8'
+//        options.charSet = 'UTF-8'
+//        exclude '**/BuildConfig.java'
+//        exclude '**/R.java'
+//        failOnError false
+//    }
+//}
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile "org.apache.commons:commons-lang3:3.3.2"
-
-}
-
-//ext {
-//    mavenRepository = "C:/Users/katsu_000/Dropbox/Devs/AndroidWorkspace/MyApps/net.granoeste.maven"
-//}
-//
-//uploadArchives {
-//    repositories {
-//        mavenDeployer {
-//            repository(url: uri(mavenRepository))
-//        }
-//    }
-//}
-
-android.libraryVariants
-publishing {
-    publications {
-        maven(MavenPublication) {
-            groupId = groupId
-            artifactId = artifactId
-            version = android.defaultConfig.versionName
-            artifact source: file("${project.buildDir}/outputs/aar/${project.name}-release.aar")
-        }
-    }
-    repositories {
-        maven {
-            url "file:${projectDir}/maven-repo"
-
-        }
-    }
 }

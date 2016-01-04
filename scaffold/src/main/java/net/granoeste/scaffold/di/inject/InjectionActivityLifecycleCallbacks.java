@@ -22,7 +22,7 @@ import android.app.Activity;
 import android.os.Bundle;
 
 import com.google.inject.Injector;
-import com.uphyca.lifecyclecallbacks.LifecycleCallbacksSupportApplication;
+import net.granoeste.scaffold.lifecyclecallbacks.LifecycleCallbacksSupportApplication;
 
 /** ActivityにDIするためのコールバック. */
 public class InjectionActivityLifecycleCallbacks extends

@@ -104,4 +104,16 @@ public final class BusProvider {
             }
         }
     }
+
+    public static void postEvent(Object event) {
+        BusProvider.getInstance().post(event);
+    }
+
+    public static void register(Object obj) {
+        BusProvider.getInstance().register(obj);
+    }
+
+    public static void unregister(Object obj) {
+        BusProvider.getInstance().unregister(obj);
+    }
 }

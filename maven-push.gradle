@@ -1,0 +1,94 @@
+//apply plugin: 'maven'
+apply plugin: 'maven-publish'
+
+task androidJavadocs(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
+    classpath += files(ext.androidJar)
+
+    options.links("http://docs.oracle.com/javase/7/docs/api/");
+    options.linksOffline("http://d.android.com/reference", "${android.sdkDirectory}/docs/reference")
+    options.docEncoding = 'UTF-8'
+    options.encoding = 'UTF-8'
+    options.charSet = 'UTF-8'
+    exclude '**/BuildConfig.java'
+    exclude '**/R.java'
+    failOnError false
+
+}
+
+task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
+    classifier = 'javadoc'
+    from androidJavadocs.destinationDir
+}
+
+task androidSourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.sourceFiles
+}
+
+// WIP
+//artifacts {
+//    archives androidSourcesJar
+//    archives androidJavadocsJar
+//}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = groupId
+            artifactId = artifactId
+            version = android.defaultConfig.versionName
+            artifact source: file("${project.buildDir}/outputs/aar/${project.name}-release.aar")
+            artifact androidSourcesJar
+            artifact androidJavadocsJar
+
+            // @see android - Gradle not including dependencies in published pom.xml - Stack Overflow http://stackoverflow.com/questions/24743562/gradle-not-including-dependencies-in-published-pom-xml
+            //The publication doesn't know about our dependencies, so we have to manually add them to the pom
+            pom.withXml {
+                def dependenciesNode = asNode().appendNode('dependencies')
+
+                //Iterate over the compile dependencies (we don't want the test ones), adding a <dependency> node for each
+                configurations.compile.allDependencies.each {
+
+// WIP
+//                    org.gradle.api.internal.artifacts.dependencies.DefaultSelfResolvingDependency_Decorated@433edba9
+//                    DefaultExternalModuleDependency{group='com.android.support', name='support-v4', version='22.1.1', configuration='default'}
+//                    DefaultExternalModuleDependency{group='com.android.support', name='appcompat-v7', version='22.1.1', configuration='default'}
+//                    DefaultProjectDependency{dependencyProject='project ':commons'', configuration='default'}
+
+                    println 'Dependency= ' + it
+//                    if (!it.name.equalsIgnoreCase('unspecified')) {
+                    if (it.getClass().toString().contains('DefaultExternalModuleDependency')) {
+                        if (!(it.name.contains('guice')||it.name.contains('javax.inject'))) {
+                            def dependencyNode = dependenciesNode.appendNode('dependency')
+                            dependencyNode.appendNode('groupId', it.group)
+                            dependencyNode.appendNode('artifactId', it.name)
+                            dependencyNode.appendNode('version', it.version)
+                        }
+                    } else if (it.getClass().toString().contains('DefaultProjectDependency')) {
+// TODO
+                        println 'groupId   = ' + it.group
+                        println 'artifactId= ' + it.name
+                        println 'version   = ' + it.version
+
+//                        def dependencyNode = dependenciesNode.appendNode('dependency')
+//                        // FIXME: groupId/artifactId/version をProjectから取得したい。
+//                        dependencyNode.appendNode('groupId', 'net.granoeste.libs')
+//                        dependencyNode.appendNode('artifactId', it.name)
+//                        dependencyNode.appendNode('version', '1.0.0')
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+//            url "file:${projectDir}/maven-repo"
+//            url "file:${rootDir}/maven-repo"
+            url "file:${rootDir}/../maven"
+//            url 'https://github.com/granoeste/maven/raw/master/maven-repo'
+//            url 'https://github.com/granoeste/maven/raw/gh-pages'
+        }
+    }
+}

@@ -48,7 +48,7 @@ public class ScaffoldProgressDialogFragment extends ScaffoldDialogFragment {
         setStyle(STYLE, THEME);
 
         // TIPS: ProgressDialog#setCancelable() では有効にならない...?
-        final boolean cancelable = getArguments().getBoolean(CANCELABLE, true);
+        final boolean cancelable = getArguments().getBoolean(CANCELABLE, false);
         setCancelable(cancelable);
     }
     
@@ -57,7 +57,7 @@ public class ScaffoldProgressDialogFragment extends ScaffoldDialogFragment {
         final int iconId = getArguments().getInt(ICON_ID, 0);
         final String title = getArguments().getString(TITLE);
         final String message = getArguments().getString(MESSAGE);
-        final boolean cancelable = getArguments().getBoolean(CANCELABLE, true);
+        final boolean cancelable = getArguments().getBoolean(CANCELABLE, false);
 
         if (mProgressDialog != null) {
             return mProgressDialog;

@@ -16,10 +16,13 @@
 
 package net.granoeste.commons.util;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.util.DisplayMetrics;
+import android.view.View;
 import android.view.WindowManager;
 
 public class UIUtils {
@@ -66,6 +69,14 @@ public class UIUtils {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
     }
 
+    public static boolean hasLollipopMr1() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1;
+    }
+
+    public static boolean hasMashmarrow() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
+    }
+
     public static boolean isTablet(Context context) {
         return (context.getResources().getConfiguration().screenLayout
                 & Configuration.SCREENLAYOUT_SIZE_MASK)
@@ -103,4 +114,102 @@ public class UIUtils {
             return false;
         }
     }
+
+    @SuppressLint("InlinedApi")
+    public static void hideSystemUI(Activity activity) {
+        // Set the IMMERSIVE flag.
+        // Set the content to appear under the system bars so that the content
+        // doesn't resize when the system bars hide and show.
+//        if (UIUtils.hasHoneycombMR1()) {
+//            activity.getWindow().getDecorView().setSystemUiVisibility(
+//                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+//                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+//                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+//                            | View.SYSTEM_UI_FLAG_LOW_PROFILE
+//                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+//                            | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
+//                            | View.SYSTEM_UI_FLAG_IMMERSIVE);
+//        }
+
+        if (!UIUtils.hasHoneycombMR1()) {
+            return;
+        }
+        int newUiOptions = activity.getWindow().getDecorView().getSystemUiVisibility();;
+        // Navigation bar hiding:  Backwards compatible to ICS.
+        if (UIUtils.hasICS()) {
+            newUiOptions |= View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+        }
+        // Status bar hiding: Backwards compatible to Jellybean
+        if (UIUtils.hasJellyBean()) {
+            newUiOptions |= View.SYSTEM_UI_FLAG_FULLSCREEN;
+        }
+        if (UIUtils.hasKitkat()) {
+            newUiOptions |= View.SYSTEM_UI_FLAG_IMMERSIVE;
+        }
+        activity.getWindow().getDecorView().setSystemUiVisibility(newUiOptions);
+    }
+
+    @SuppressLint("InlinedApi")
+    public static void hideSystemUIImmersiveSticky(Activity activity) {
+        // Set the IMMERSIVE STICKY flag.
+        // Set the content to appear under the system bars so that the content
+        // doesn't resize when the system bars hide and show.
+//        if (UIUtils.hasHoneycombMR1()) {
+//            activity.getWindow().getDecorView().setSystemUiVisibility(
+//                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+//                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+//                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+//                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+//                            | View.SYSTEM_UI_FLAG_FULLSCREEN
+//                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+//        }
+
+        if (!UIUtils.hasHoneycombMR1()) {
+            return;
+        }
+        int newUiOptions = activity.getWindow().getDecorView().getSystemUiVisibility();;
+        // Navigation bar hiding:  Backwards compatible to ICS.
+        if (UIUtils.hasICS()) {
+            newUiOptions |= View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+        }
+        // Status bar hiding: Backwards compatible to Jellybean
+        if (UIUtils.hasJellyBean()) {
+            newUiOptions |= View.SYSTEM_UI_FLAG_FULLSCREEN;
+        }
+        if (UIUtils.hasKitkat()) {
+            newUiOptions |= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+        }
+        activity.getWindow().getDecorView().setSystemUiVisibility(newUiOptions);
+    }
+
+    // This snippet shows the system bars. It does this by removing all the flags
+    // except for the ones that make the content appear under the system bars.
+    @SuppressLint("InlinedApi")
+    public static void showSystemUI(Activity activity) {
+//        if (UIUtils.hasHoneycombMR1()) {
+//            activity.getWindow().getDecorView().setSystemUiVisibility(
+//                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+//                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+//                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+//        }
+
+        if (!UIUtils.hasHoneycombMR1()) {
+            return;
+        }
+        int newUiOptions = activity.getWindow().getDecorView().getSystemUiVisibility();
+        // Navigation bar hiding:  Backwards compatible to ICS.
+        if (UIUtils.hasICS()) {
+            newUiOptions &= ~View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+        }
+        // Status bar hiding: Backwards compatible to Jellybean
+        if (UIUtils.hasJellyBean()) {
+            newUiOptions &= ~View.SYSTEM_UI_FLAG_FULLSCREEN;
+        }
+        if (UIUtils.hasKitkat()) {
+            newUiOptions &= ~View.SYSTEM_UI_FLAG_IMMERSIVE;
+            newUiOptions &= ~View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+        }
+        activity.getWindow().getDecorView().setSystemUiVisibility(newUiOptions);
+    }
+
 }

@@ -16,12 +16,9 @@
 
 package net.granoeste.scaffold.app;
 
-import android.content.Context;
 import android.content.Intent;
 
-import com.uphyca.lifecyclecallbacks.LifecycleCallbacksSupportIntentService;
-
-import net.granoeste.scaffold.app.builder.ServiceIntentBuilder;
+import net.granoeste.scaffold.lifecyclecallbacks.LifecycleCallbacksSupportIntentService;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -87,28 +84,4 @@ public abstract class ScaffoldIntentService extends LifecycleCallbacksSupportInt
         super.onDestroy();
     }
 
-    // ------------------------------------------------------------------------
-    // EventBus
-    // ------------------------------------------------------------------------
-    protected final void postEvent(Object e) {
-        BusProvider.getInstance().post(e);
-    }
-
-    protected final void registerEventBus() {
-        BusProvider.getInstance().register(this);
-    }
-
-    protected final void unregisterEventBus() {
-        BusProvider.getInstance().unregister(this);
-    }
-
-    /**
-     * IntentBuilder
-     */
-    public static class IntentBuilder
-            extends ServiceIntentBuilder<ScaffoldService.IntentBuilder> {
-        public IntentBuilder(Context context, Class<?> clazz) {
-            super(context, clazz);
-        }
-    }
 }

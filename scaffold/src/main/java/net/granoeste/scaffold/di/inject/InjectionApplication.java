@@ -21,7 +21,7 @@ import java.lang.ref.WeakReference;
 import java.util.logging.Level;
 
 import com.google.inject.Injector;
-import com.uphyca.lifecyclecallbacks.LifecycleCallbacksSupportApplication;
+import net.granoeste.scaffold.lifecyclecallbacks.LifecycleCallbacksSupportApplication;
 
 public class InjectionApplication extends LifecycleCallbacksSupportApplication {
 	@SuppressWarnings("unused")
@@ -44,7 +44,7 @@ public class InjectionApplication extends LifecycleCallbacksSupportApplication {
 	public Injector setInjector(Injector newInjector) {
 		synchronized (this) {
 			final Injector previousInjector = (mInjector != null) ? mInjector.get() : null;
-			mInjector = new WeakReference<Injector>(newInjector);
+			mInjector = new WeakReference<>(newInjector);
 			unregisterPreviousCallbacks();
 			registerCallbacks(newInjector);
 			return previousInjector;

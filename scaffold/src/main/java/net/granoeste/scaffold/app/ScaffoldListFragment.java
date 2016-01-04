@@ -24,7 +24,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
-import com.uphyca.lifecyclecallbacks.LifecycleCallbacksSupportListFragment;
+import net.granoeste.scaffold.lifecyclecallbacks.LifecycleCallbacksSupportListFragment;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -104,21 +104,6 @@ public abstract class ScaffoldListFragment extends LifecycleCallbacksSupportList
     }
 
     // ------------------------------------------------------------------------
-    // EventBus
-    // ------------------------------------------------------------------------
-    protected final void postEvent(Object e) {
-        BusProvider.getInstance().post(e);
-    }
-
-    protected final void registerEventBus() {
-        BusProvider.getInstance().register(this);
-    }
-
-    protected final void unregisterEventBus() {
-        BusProvider.getInstance().unregister(this);
-    }
-
-    // ------------------------------------------------------------------------
     // AlertDialogFragment Utility
     // ------------------------------------------------------------------------
     /**
@@ -160,7 +145,7 @@ public abstract class ScaffoldListFragment extends LifecycleCallbacksSupportList
     protected final void showDialog(final int iconId, final String title, final String message,
                                     final boolean hasPositive, final boolean hasNeutral, final boolean hasNegative,
                                     final boolean cancelable, final String tag) {
-        ScaffoldAlertDialogFragment.builder()
+        ScaffoldAlertDialogFragment.builder(getActivity(), getActivity().getSupportFragmentManager())
                 .iconId(iconId)
                 .title(title)
                 .message(message)
@@ -190,7 +175,7 @@ public abstract class ScaffoldListFragment extends LifecycleCallbacksSupportList
                                     final boolean hasPositive, final boolean hasNeutral, final boolean hasNegative,
                                     final String positiveText, final String neutralText, final String negativeText,
                                     final boolean cancelable, final String tag) {
-        ScaffoldAlertDialogFragment.builder()
+        ScaffoldAlertDialogFragment.builder(getActivity(), getActivity().getSupportFragmentManager())
                 .iconId(iconId)
                 .title(title)
                 .message(message)

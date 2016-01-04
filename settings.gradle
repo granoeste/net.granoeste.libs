@@ -1,1 +1,1 @@
-include ':commons', ':commons.twitter', ':commons.nfc', ':commons.ui', ':validator', ':scaffold', ':scaffold.sample'
+include ':commons', ':commons.twitter', ':commons.nfc', ':commons.ui', ':validator', ':scaffold'

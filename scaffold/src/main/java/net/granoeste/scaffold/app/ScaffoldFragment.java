@@ -24,7 +24,7 @@ import android.support.v4.app.DialogFragment;
 import android.view.View;
 import android.widget.Toast;
 
-import com.uphyca.lifecyclecallbacks.LifecycleCallbacksSupportFragment;
+import net.granoeste.scaffold.lifecyclecallbacks.LifecycleCallbacksSupportFragment;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -116,21 +116,6 @@ public abstract class ScaffoldFragment extends LifecycleCallbacksSupportFragment
     }
 
     // ------------------------------------------------------------------------
-    // EventBus
-    // ------------------------------------------------------------------------
-    protected final void postEvent(Object e) {
-        BusProvider.getInstance().post(e);
-    }
-
-    protected final void registerEventBus() {
-        BusProvider.getInstance().register(this);
-    }
-
-    protected final void unregisterEventBus() {
-        BusProvider.getInstance().unregister(this);
-    }
-
-    // ------------------------------------------------------------------------
     // AlertDialogFragment Utility
     // ------------------------------------------------------------------------
     /**
@@ -182,7 +167,7 @@ public abstract class ScaffoldFragment extends LifecycleCallbacksSupportFragment
                 .hasNegative(hasNegative)
                 .cancelable(cancelable)
                 .tag(tag)
-                .show();
+                .buildAndShow();
     }
 
     /**
@@ -216,7 +201,11 @@ public abstract class ScaffoldFragment extends LifecycleCallbacksSupportFragment
                 .negativeText(negativeText)
                 .cancelable(cancelable)
                 .tag(tag)
-                .show();
+                .buildAndShow();
+    }
+
+    protected final ScaffoldAlertDialogFragment.FragmentBuilder getDialogBuilder() {
+        return ScaffoldAlertDialogFragment.builder(getActivity(), getActivity().getSupportFragmentManager());
     }
 
     // CallBack Listener
@@ -224,13 +213,13 @@ public abstract class ScaffoldFragment extends LifecycleCallbacksSupportFragment
     public final void onDialogClick(final DialogInterface dialog, final int whichButton, final String tag) {
         switch (whichButton) {
             case DialogInterface.BUTTON_POSITIVE:
-                doPositiveClick(dialog, whichButton, tag);
+                doPositiveClick(dialog, tag);
                 break;
             case DialogInterface.BUTTON_NEUTRAL:
-                doNeutralClick(dialog, whichButton, tag);
+                doNeutralClick(dialog, tag);
                 break;
             case DialogInterface.BUTTON_NEGATIVE:
-                doNegativeClick(dialog, whichButton, tag);
+                doNegativeClick(dialog, tag);
                 break;
             default:
                 break;
@@ -246,34 +235,27 @@ public abstract class ScaffoldFragment extends LifecycleCallbacksSupportFragment
      * doPositiveClick
      *
      * @param dialog
-     * @param whichButton
      * @param tag
      */
-    protected void doPositiveClick(final DialogInterface dialog, final int whichButton,
-                                   final String tag) {
+    protected void doPositiveClick(final DialogInterface dialog, final String tag) {
     }
 
     /**
      * doNeutralClick
      *
      * @param dialog
-     * @param whichButton
      * @param tag
      */
-    protected void doNeutralClick(final DialogInterface dialog, final int whichButton,
-                                  final String tag) {
-
+    protected void doNeutralClick(final DialogInterface dialog, final String tag) {
     }
 
     /**
      * doNegativeClick
      *
      * @param dialog
-     * @param whichButton
      * @param tag
      */
-    protected void doNegativeClick(final DialogInterface dialog, final int whichButton,
-                                   final String tag) {
+    protected void doNegativeClick(final DialogInterface dialog, final String tag) {
     }
 
     /**
@@ -334,17 +316,4 @@ public abstract class ScaffoldFragment extends LifecycleCallbacksSupportFragment
         return (T) v.findViewById(id);
     }
 
-    public static class FragmentBuilder
-            extends net.granoeste.scaffold.app.builder.FragmentBuilder<ScaffoldFragment
-            .FragmentBuilder, ScaffoldFragment> {
-
-        @Override
-        public ScaffoldFragment build() {
-// WIP
-//            ScaffoldFragment fragment = new ScaffoldFragment();
-//            fragment.setArguments(args);
-//            return fragment;
-            return null;
-        }
-    }
 }
